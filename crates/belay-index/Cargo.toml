@@ -1,0 +1,28 @@
+[package]
+name = "belay-index"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+syn = { workspace = true }
+proc-macro2 = { workspace = true }
+rayon = { workspace = true }
+lasso = { workspace = true }
+rustc-hash = { workspace = true }
+blake3 = { workspace = true }
+fixedbitset = { workspace = true }
+roaring = { workspace = true }
+bumpalo = { workspace = true }
+arc-swap = { workspace = true }
+ignore = { workspace = true }
+redb = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tokio = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"

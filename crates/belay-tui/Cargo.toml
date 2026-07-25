@@ -1,0 +1,18 @@
+[package]
+name = "belay-tui"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+belay-index = { path = "../belay-index" }
+belay-engine = { path = "../belay-engine" }
+belay-stat = { path = "../belay-stat" }
+ratatui = { workspace = true }
+crossterm = { workspace = true }
+tokio = { workspace = true }
+arc-swap = { workspace = true }
+hdrhistogram = { workspace = true }
+rustc-hash = { workspace = true }

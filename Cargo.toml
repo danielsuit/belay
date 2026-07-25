@@ -1,0 +1,74 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/belay-index",
+    "crates/belay-taint",
+    "crates/belay-plan",
+    "crates/belay-engine",
+    "crates/belay-stat",
+    "crates/belay-tui",
+    "crates/belay-report",
+    "crates/belay-eval",
+    "crates/belay-cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+license = "MIT OR Apache-2.0"
+authors = ["Daniel Suit"]
+
+[workspace.dependencies]
+# async + runtime
+tokio = { version = "1", features = ["full"] }
+# parsing
+syn = { version = "2", features = ["full", "visit", "extra-traits", "parsing"] }
+proc-macro2 = { version = "1", features = ["span-locations"] }
+rayon = "1"
+# incremental
+salsa = "0.16"
+# interning
+lasso = { version = "0.7", features = ["multi-threaded"] }
+# hashing
+rustc-hash = "2"
+blake3 = "1"
+# bitsets
+fixedbitset = "0.5"
+roaring = "0.10"
+# arena
+bumpalo = "3"
+# snapshots
+arc-swap = "1"
+# walk + watch
+ignore = "0.4"
+notify = "7"
+# http
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "http2", "json", "stream"] }
+# serde
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+simd-json = "0.14"
+# cli
+clap = { version = "4", features = ["derive", "env"] }
+# persistence
+redb = "2"
+# allocator
+mimalloc = "0.1"
+# metrics
+hdrhistogram = "7"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# tui
+ratatui = "0.29"
+crossterm = "0.28"
+# ids
+ulid = "1"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+debug = 1
+
+[profile.dev]
+opt-level = 1

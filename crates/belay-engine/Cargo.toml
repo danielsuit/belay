@@ -1,0 +1,26 @@
+[package]
+name = "belay-engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+belay-index = { path = "../belay-index" }
+belay-taint = { path = "../belay-taint" }
+belay-stat = { path = "../belay-stat" }
+belay-plan = { path = "../belay-plan" }
+reqwest = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+simd-json = { workspace = true }
+rustc-hash = { workspace = true }
+blake3 = { workspace = true }
+tracing = { workspace = true }
+hdrhistogram = { workspace = true }
+async-trait = "0.1"
+
+[dev-dependencies]
+tempfile = "3"
