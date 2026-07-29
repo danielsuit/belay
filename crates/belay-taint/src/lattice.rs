@@ -54,11 +54,15 @@ impl Lattice for SetLattice {
     }
 }
 
-/// A control-flow graph: `succ[node]` is the list of successors.
+/// A control-flow graph: `succ[node]` is the list of successors and
+/// `pred[node]` the list of predecessors, kept as a reverse-adjacency list so
+/// IN-sets can be computed in O(in-deg) rather than by scanning every node
+/// (§II.2 CSR/reverse philosophy).
 #[derive(Clone, Debug)]
 pub struct Cfg {
     pub entry: usize,
     pub succ: Vec<Vec<usize>>,
+    pub pred: Vec<Vec<usize>>,
 }
 
 impl Cfg {
@@ -66,10 +70,12 @@ impl Cfg {
         Self {
             entry,
             succ: vec![Vec::new(); n],
+            pred: vec![Vec::new(); n],
         }
     }
     pub fn add_edge(&mut self, u: usize, v: usize) {
         self.succ[u].push(v);
+        self.pred[v].push(u);
     }
     pub fn n(&self) -> usize {
         self.succ.len()
@@ -98,12 +104,13 @@ pub fn solve_forward<L: Lattice>(
 
     let mut worklist: Vec<usize> = (0..n).collect();
     while let Some(u) = worklist.pop() {
-        // IN[u] = join of OUT[pred] (and seed)
-        let mut inu = seeds[u].clone().unwrap_or_else(|| L::bottom(universe));
-        for pred in 0..n {
-            if cfg.succ[pred].contains(&u) {
-                inu = inu.join(&out[pred]);
-            }
+        // IN[u] = seed[u] ⊔ join of OUT[pred] over predecessors (O(in-deg(u))).
+        let mut inu = L::bottom(universe);
+        if let Some(seed) = &seeds[u] {
+            inu = inu.join(seed);
+        }
+        for &pred in &cfg.pred[u] {
+            inu = inu.join(&out[pred]);
         }
         in_[u] = inu.clone();
         let new_out = transfer(u, &inu);
