@@ -94,6 +94,11 @@ pub fn parse_judgment(content: &str) -> Option<Judgment> {
     // Tolerant: find the first {...} JSON object in the content.
     let start = content.find('{')?;
     let end = content.rfind('}')? + 1;
+    // The last '}' may precede the first '{' (e.g. a stray '}' and an unclosed
+    // '{'); slicing content[start..end] would then panic, so bail out instead.
+    if start >= end {
+        return None;
+    }
     let v: Value = serde_json::from_str(&content[start..end]).ok()?;
     let verdict = match v.get("verdict")?.as_str()? {
         "vuln" => Verdict::Vuln,
@@ -130,5 +135,13 @@ mod tests {
         let j = j.unwrap();
         assert_eq!(j.verdict, Verdict::Vuln);
         assert!((j.p - 0.93).abs() < 1e-9);
+    }
+
+    #[test]
+    fn parse_judgment_brace_order_no_panic() {
+        // Last '}' precedes first '{' (a stray '}' then an unclosed '{').
+        // The old first-'{'/last-'}' heuristic panicked slicing [start..end];
+        // this must return None instead of aborting the scan.
+        assert!(parse_judgment(r#"} trailing {"verdict":"vuln""#).is_none());
     }
 }

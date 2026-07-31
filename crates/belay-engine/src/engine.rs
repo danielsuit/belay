@@ -187,6 +187,11 @@ struct ParsedFinding {
 fn parse_findings(content: &str) -> Option<Vec<ParsedFinding>> {
     let start = content.find('{')?;
     let end = content.rfind('}')? + 1;
+    // The last '}' may precede the first '{' (e.g. a stray '}' and an unclosed
+    // '{'); slicing content[start..end] would then panic, so bail out instead.
+    if start >= end {
+        return None;
+    }
     let v: Value = serde_json::from_str(&content[start..end]).ok()?;
     let arr = v.get("findings")?.as_array()?;
     let mut out = Vec::new();
@@ -292,6 +297,14 @@ mod tests {
     use crate::model::{ModelResponse, ScriptedModel};
     use std::fs;
     use tempfile::tempdir;
+
+    #[test]
+    fn parse_findings_brace_order_no_panic() {
+        // Last '}' precedes first '{' (a stray '}' then an unclosed '{').
+        // The old first-'{'/last-'}' heuristic panicked slicing [start..end];
+        // this must return None instead of aborting the scan.
+        assert!(parse_findings(r#"} trailing {"findings":[]"#).is_none());
+    }
 
     fn gateway_index() -> (tempfile::TempDir, Index, Slice) {
         let dir = tempdir().unwrap();
